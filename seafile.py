@@ -66,13 +66,21 @@ class Libraries:
         }
         html = requests.get(base_url, params=params, headers=self.headers)
         return html.json()
+
     def creatUploadLink(self, path):
-        base_url = "https://box.nju.edu.cn/api/v2.1/upload-links/"
+        true = True
+        false = False
+        base_url = "https://box.nju.edu.cn/api/v2.1/share-links/"
         body = {
-            "repo_id":self.repo_id,
-            "path":path
+            "repo_id": self.repo_id,
+            "path": path,
+            "permissions": {
+                "can_edit": false,
+                "can_download": true,
+                "can_upload": false
+            }
         }
-        response = requests.post(base_url,data=body,headers=self.headers)
+        response = requests.post(base_url, data=body, headers=self.headers)
         result = response.json()
         if result.get("error_msg"):
             print(result['error_msg'])

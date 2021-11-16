@@ -81,12 +81,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.url_path.setText(self.library.path)
         self.listWidget.itemDoubleClicked.connect(self.forward)
         self.back.clicked.connect(self.backward)
-        self.select_all.clicked.connect(self.docheck)
+        self.select_all.clicked.connect(self.check)
         self.search_button.clicked.connect(self.search)
-        self.pushButton.clicked.connect(self.creatUploadLink)
+        self.pushButton.clicked.connect(self.getUploadLinks)
         self.search_input.returnPressed.connect(self.search)
 
-    def docheck(self):
+    def check(self):
         if self.select_all.isChecked():
             self.listWidget.selectAll()
             for i in range(self.listWidget.count()):
@@ -190,17 +190,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             item_list.append(item)
         self.update_list(item_list)
 
-    def creatUploadLink(self):
+    def getUploadLinks(self):
         if self.library.repo_id is None:
             QMessageBox.critical(self, "警告", "请先指定资料库", QMessageBox.Ok)
             return
-        
-        print(self.library.creatUploadLink(""))
-
+        basePath = self.url_path.text()
+        for i in range(self.listWidget.count()):
+            i = self.listWidget.item(i)
+            print(i)
+            if i.checkState():
+                print(self.library.creatUploadLink(basePath + i.text()))
 
 
 if __name__ == '__main__':
-
     app = QApplication(sys.argv)
     login = Login()
     test = QWidget()
