@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QApplication, QMessageBox, QMainWindow, \
-    QListWidgetItem
+    QListWidgetItem, QFileDialog
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import QSize, Qt
 from Ui_Login import Ui_Form
@@ -69,7 +69,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.library.tree.create_node(tag=lib['name'], parent=self.library.root, data=lib)
             item = QListWidgetItem()
             icon = QIcon()
-            if lib['encrypted'] == False:
+            if not lib['encrypted']:
                 icon.addPixmap(QPixmap("./resource/lib.png"), QIcon.Selected, QIcon.On)
             else:
                 icon.addPixmap(QPixmap("./resource/lib-encrypted.png"), QIcon.Selected, QIcon.On)
@@ -84,6 +84,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.select_all.clicked.connect(self.check)
         self.search_button.clicked.connect(self.search)
         self.pushButton.clicked.connect(self.getUploadLinks)
+        self.uploadFolderButton.clicked.connect(self.creatFolder)
         self.search_input.returnPressed.connect(self.search)
 
     def check(self):
@@ -191,6 +192,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             item_list.append(item)
         self.update_list(item_list)
 
+    def creatFolder(self):
+        if self.library.repo_id is None:
+            QMessageBox.critical(self, "警告", "请先指定资料库", QMessageBox.Ok)
+            return
+        csvName, fileType = QFileDialog.getOpenFileName(self, "打开图片", "", "*.csv;;*.txt")
+
+        basePath = self.url_path.text()
+
+        with open(csvName, 'r', encoding="utf-8") as f:
+            for line in f:
+                folderName = line.replace("\n", "")
+                self.library.creatDirectory(basePath + folderName)
+
     def getUploadLinks(self):
         if self.library.repo_id is None:
             QMessageBox.critical(self, "警告", "请先指定资料库", QMessageBox.Ok)
@@ -199,21 +213,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         basePath = self.url_path.text()
         for i in range(self.listWidget.count()):
             item = self.listWidget.item(i)
-            if self.item_list[i]['type'] in ['dir', 'folder']:
-                if item.checkState():
+            if item.checkState():
+                item.setCheckState(Qt.Unchecked)
+                if self.item_list[i]['type'] in ['dir', 'folder']:
                     link = self.library.creatUploadLink(basePath + item.text())
                     storeNode = {"link": link, "folderName": item.text()}
                     result.append(storeNode)
         if len(result) > 0:
             with open("linksOfFolder.csv", "a+") as f:
                 for i in range(len(result)):
-                    f.write(result[i]['link'] + "," + result[i]["folderName"])
+                    f.write(result[i]['link'] + "," + result[i]["folderName"] + "\n")
+
+        self.select_all.setChecked(False)
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     login = Login()
-    test = QWidget()
+    # test = QWidget()
     # login.get_libraries()
     login.show()
     sys.exit(app.exec_())

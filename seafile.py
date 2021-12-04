@@ -16,7 +16,7 @@ class Libraries:
         self.headers = {
             'Authorization': "Token {}".format(self.token),
             'Accept': 'application/json; indent=4',
-            'Content-type': 'application/json'
+
         }
         self.tree = Tree()
         self.root = Node("root")
@@ -79,8 +79,10 @@ class Libraries:
                 "can_upload": True
             }
         }
+        header = self.headers
+        header["Content-type"] = "application/json"
 
-        response = requests.post(base_url, json=body, headers=self.headers)
+        response = requests.post(base_url, json=body, headers=header)
         result = response.json()
         if result.get("error_msg"):
             print(result['error_msg'])
@@ -88,3 +90,16 @@ class Libraries:
             print(result.get("link"))
             return result['link']
 
+    def creatDirectory(self, path):
+        base_url = "https://box.nju.edu.cn/api2/repos/{}/dir/".format(self.repo_id)
+        body = {
+            "operation": "mkdir"
+        }
+        params = {
+            "p": path
+        }
+        header = self.headers
+        header["Accept"] = "application/json; charset=utf-8; indent=4"
+
+        response = requests.post(base_url, data=body, params=params, headers=header)
+        print(response.json())

@@ -155,6 +155,19 @@
       <string>生成上传链接</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="uploadFolderButton">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>110</y>
+       <width>121</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>批量生成文件夹</string>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
