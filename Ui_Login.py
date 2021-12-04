@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\12463\Desktop\cac\Login.ui'
+# Form implementation generated from reading ui file 'c:\Users\12463\PycharmProjects\nju-seafile\seafile-python\Login.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -26,7 +26,7 @@ class Ui_Form(object):
         self.title_pic.setGeometry(QtCore.QRect(110, 0, 271, 171))
         self.title_pic.setAutoFillBackground(False)
         self.title_pic.setText("")
-        self.title_pic.setPixmap(QtGui.QPixmap("c:\\Users\\12463\\Desktop\\cac\\resource/mylogo.png"))
+        self.title_pic.setPixmap(QtGui.QPixmap("c:\\Users\\12463\\PycharmProjects\\nju-seafile\\seafile-python\\resource/mylogo.png"))
         self.title_pic.setAlignment(QtCore.Qt.AlignCenter)
         self.title_pic.setObjectName("title_pic")
         self.horizontalLayoutWidget = QtWidgets.QWidget(Form)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\12463\Desktop\cac\MainWindows.ui'
+# Form implementation generated from reading ui file 'c:\Users\12463\PycharmProjects\nju-seafile\seafile-python\MainWindows.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -40,7 +40,7 @@ class Ui_MainWindow(object):
         self.back.setStyleSheet("")
         self.back.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("c:\\Users\\12463\\Desktop\\cac\\resource/返回.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("c:\\Users\\12463\\PycharmProjects\\nju-seafile\\seafile-python\\resource/返回.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.back.setIcon(icon)
         self.back.setIconSize(QtCore.QSize(28, 28))
         self.back.setObjectName("back")

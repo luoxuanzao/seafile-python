@@ -15,7 +15,8 @@ class Libraries:
         self.token = token
         self.headers = {
             'Authorization': "Token {}".format(self.token),
-            'Accept': 'application/json; indent=4'
+            'Accept': 'application/json; indent=4',
+            'Content-type': 'application/json'
         }
         self.tree = Tree()
         self.root = Node("root")
@@ -68,22 +69,22 @@ class Libraries:
         return html.json()
 
     def creatUploadLink(self, path):
-        true = True
-        false = False
         base_url = "https://box.nju.edu.cn/api/v2.1/share-links/"
         body = {
             "repo_id": self.repo_id,
             "path": path,
             "permissions": {
-                "can_edit": false,
-                "can_download": true,
-                "can_upload": false
+                "can_edit": False,
+                "can_download": True,
+                "can_upload": True
             }
         }
-        response = requests.post(base_url, data=body, headers=self.headers)
+
+        response = requests.post(base_url, json=body, headers=self.headers)
         result = response.json()
         if result.get("error_msg"):
             print(result['error_msg'])
         else:
             print(result.get("link"))
             return result['link']
+

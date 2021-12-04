@@ -100,6 +100,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for node in self.library.tree.children(self.library.current.identifier):
             self.library.tree.remove_node(node.identifier)
         self.listWidget.clear()
+        self.item_list = item_list
         self.url_path.setText(self.library.path)
         for item_data in item_list:
             if item_data is None:
@@ -194,12 +195,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.library.repo_id is None:
             QMessageBox.critical(self, "警告", "请先指定资料库", QMessageBox.Ok)
             return
+        result = []
         basePath = self.url_path.text()
         for i in range(self.listWidget.count()):
-            i = self.listWidget.item(i)
-            print(i)
-            if i.checkState():
-                print(self.library.creatUploadLink(basePath + i.text()))
+            item = self.listWidget.item(i)
+            if self.item_list[i]['type'] in ['dir', 'folder']:
+                if item.checkState():
+                    link = self.library.creatUploadLink(basePath + item.text())
+                    storeNode = {"link": link, "folderName": item.text()}
+                    result.append(storeNode)
+        if len(result) > 0:
+            with open("linksOfFolder.csv", "a+") as f:
+                for i in range(len(result)):
+                    f.write(result[i]['link'] + "," + result[i]["folderName"])
 
 
 if __name__ == '__main__':
@@ -209,7 +217,3 @@ if __name__ == '__main__':
     # login.get_libraries()
     login.show()
     sys.exit(app.exec_())
-
-    # app = QApplication(sys.argv)
-    # main = MainWindow(QWidget())
-    # main.get_libraries()
