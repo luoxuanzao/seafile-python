@@ -103,3 +103,18 @@ class Libraries:
 
         response = requests.post(base_url, data=body, params=params, headers=header)
         print(response.json())
+
+    def getSharedLinks(self):
+        base_url = "https://box.nju.edu.cn/api/v2.1/share-links/"
+        header = self.headers
+        header["Accept"] = "application/json; charset=utf-8; indent=4"
+
+        response = requests.get(base_url, headers=header)
+        return response.json()
+
+    def deleteSharedLinks(self, linkToken):
+
+        base_url = "https://box.nju.edu.cn/api/v2.1/share-links/{}/".format(linkToken)
+        print(base_url)
+        response = requests.delete(base_url, headers=self.headers)
+        print(response.json())

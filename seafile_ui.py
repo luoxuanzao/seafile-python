@@ -1,10 +1,11 @@
 from PyQt5.QtWidgets import QWidget, QApplication, QMessageBox, QMainWindow, \
-    QListWidgetItem, QFileDialog
+    QListWidgetItem, QFileDialog, QDialog
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import QSize, Qt
 from Ui_Login import Ui_Form
 from conf import config
 from Ui_MainWindows import Ui_MainWindow
+from Ui_Links import Ui_Dialog
 import sys
 import requests
 from urllib.parse import urlencode
@@ -83,9 +84,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.back.clicked.connect(self.backward)
         self.select_all.clicked.connect(self.check)
         self.search_button.clicked.connect(self.search)
-        self.pushButton.clicked.connect(self.getUploadLinks)
+        self.pushButton.clicked.connect(self.creatUploadLinks)
         self.uploadFolderButton.clicked.connect(self.creatFolder)
         self.search_input.returnPressed.connect(self.search)
+        self.checkSharedLink.clicked.connect(self.ShowLinkWindow)
 
     def check(self):
         if self.select_all.isChecked():
@@ -205,7 +207,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 folderName = line.replace("\n", "")
                 self.library.creatDirectory(basePath + folderName)
 
-    def getUploadLinks(self):
+    def creatUploadLinks(self):
         if self.library.repo_id is None:
             QMessageBox.critical(self, "警告", "请先指定资料库", QMessageBox.Ok)
             return
@@ -225,6 +227,49 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     f.write(result[i]['link'] + "," + result[i]["folderName"] + "\n")
 
         self.select_all.setChecked(False)
+
+    def ShowLinkWindow(self):
+        main_windows = CheckLinks(self)
+        main_windows.token = self.token
+        main_windows.init()
+        main_windows.show()
+
+
+class CheckLinks(QDialog, Ui_Dialog):
+    def __init__(self, parent=None):
+        super(QDialog, self).__init__(parent)
+        self.setupUi(self)
+
+    def init(self):
+        self.library = Libraries(self.token)
+        self.link_list = self.library.getSharedLinks()
+        for link in self.link_list:
+            print(link)
+            item = QListWidgetItem()
+            icon = QIcon()
+            icon.addPixmap(QPixmap("./resource/link.png"), QIcon.Selected, QIcon.On)
+            item.setIcon(icon)
+            item.setText(link['repo_name'] + "/" + link['path'])
+            item.setCheckState(Qt.Unchecked)
+            self.listWidget.addItem(item)
+        self.select_all.clicked.connect(self.check)
+        self.deleteLinks.clicked.connect(self.deleteUploadLinks)
+
+    def check(self):
+        if self.select_all.isChecked():
+            self.listWidget.selectAll()
+            for i in range(self.listWidget.count()):
+                self.listWidget.item(i).setCheckState(Qt.Checked)
+        else:
+            self.listWidget.clearSelection()
+            for i in range(self.listWidget.count()):
+                self.listWidget.item(i).setCheckState(Qt.Unchecked)
+
+    def deleteUploadLinks(self):
+        for i in range(self.listWidget.count()):
+            item = self.listWidget.item(i)
+            if item.checkState():
+                self.library.deleteSharedLinks(self.link_list[i]['token'])
 
 
 if __name__ == '__main__':
