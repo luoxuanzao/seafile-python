@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QApplication, QMessageBox, QMainWindow, \
     QListWidgetItem, QFileDialog, QDialog
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtCore import QSize, Qt, QDateTime
 from Ui_Login import Ui_Form
 from conf import config
 from Ui_MainWindows import Ui_MainWindow
@@ -213,6 +213,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.library.repo_id is None:
             QMessageBox.critical(self, "警告", "请先指定资料库", QMessageBox.Ok)
             return
+
         # result = []
         # basePath = self.url_path.text()
         # for i in range(self.listWidget.count()):
@@ -223,15 +224,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #             link = self.library.creatUploadLink(basePath + item.text())
         #             storeNode = {"link": link, "folderName": item.text()}
         #             result.append(storeNode)
-        # if len(result) > 0:
-        #     with open("linksOfFolder.csv", "a+") as f:
-        #         for i in range(len(result)):
-        #             f.write(result[i]['link'] + "," + result[i]["folderName"] + "\n")
-        #
-        # self.select_all.setChecked(False)
+
+        self.select_all.setChecked(False)
+        paths = []
+        basePath = self.url_path.text()
+        for i in range(self.listWidget.count()):
+            item = self.listWidget.item(i)
+            if item.checkState():
+                item.setCheckState(Qt.Unchecked)
+                if self.item_list[i]['type'] in ['dir', 'folder']:
+                    paths.append(basePath + item.text())
+
+        if len(paths) == 0:
+            print("请选择文件夹")
+            return
+
         share_windows = ShareConfig(self)
         share_windows.token = self.token
-
+        # share_windows.paths = paths
         share_windows.init()
         share_windows.show()
 
@@ -286,8 +296,48 @@ class ShareConfig(QDialog, ShareConf):
 
     def init(self):
         self.library = Libraries(self.token)
+        self.generateLinksButton.clicked.connect(self.generateLinks)
+        self.checkAndDownload.setChecked(True)
+        self.checkAndDownload.clicked.connect(self.selectCheckBox)
+        self.checkOnly.clicked.connect(self.selectCheckBox)
+        self.downloadAndUpload.clicked.connect(self.selectCheckBox)
+        self.Expiration.setMinimumDateTime(QDateTime.currentDateTime())
+        self.Expiration.setCalendarPopup(True)
 
+        self.can_edit = False,
+        self.can_download = False
+        self.can_upload = False
 
+    def selectCheckBox(self):
+        # 预览与下载
+        if self.checkAndDownload.isChecked():
+            self.can_upload = False
+            self.can_download = True
+            return
+        # 下载和上传
+        if self.downloadAndUpload.isChecked():
+            self.can_download = True
+            self.can_upload = True
+            return
+        # 仅查看
+        if self.checkOnly.isChecked():
+            self.can_download = False
+            self.can_upload = False
+
+    def generateLinks(self):
+        if self.SetPassword.isChecked():
+            print(self.password.text())
+        if self.SetExpiration.isChecked():
+            print(self.Expiration.text())
+
+        # result = []
+        # for path in self.paths:
+        #     result.append(self.library.creatUploadLink(path))
+        #
+        # if len(result) > 0:
+        #     with open("linksOfFolder.csv", "a+") as f:
+        #         for i in range(len(result)):
+        #             f.write(result[i]['link'] + "," + result[i]["folderName"] + "\n")
 
 
 if __name__ == '__main__':

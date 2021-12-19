@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="generateLinksButton">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -61,19 +61,6 @@
     <string>设置过期时间</string>
    </property>
   </widget>
-  <widget class="QDateEdit" name="dateEdit">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>180</y>
-     <width>110</width>
-     <height>24</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QWidget" name="widget_2" native="true">
    <property name="geometry">
     <rect>
@@ -85,7 +72,7 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <widget class="QRadioButton" name="radioButton">
+     <widget class="QRadioButton" name="checkAndDownload">
       <property name="enabled">
        <bool>true</bool>
       </property>
@@ -95,7 +82,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QRadioButton" name="radioButton_2">
+     <widget class="QRadioButton" name="checkOnly">
       <property name="enabled">
        <bool>true</bool>
       </property>
@@ -105,7 +92,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QRadioButton" name="radioButton_3">
+     <widget class="QRadioButton" name="downloadAndUpload">
       <property name="enabled">
        <bool>true</bool>
       </property>
@@ -132,7 +119,7 @@
     <string>输入密码</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit">
+  <widget class="QLineEdit" name="password">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -145,38 +132,34 @@
     </rect>
    </property>
   </widget>
+  <widget class="QDateTimeEdit" name="Expiration">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>180</y>
+     <width>194</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
  <tabstops>
   <tabstop>SetPassword</tabstop>
   <tabstop>SetExpiration</tabstop>
-  <tabstop>dateEdit</tabstop>
-  <tabstop>radioButton</tabstop>
-  <tabstop>radioButton_2</tabstop>
-  <tabstop>radioButton_3</tabstop>
-  <tabstop>pushButton</tabstop>
+  <tabstop>checkAndDownload</tabstop>
+  <tabstop>checkOnly</tabstop>
+  <tabstop>downloadAndUpload</tabstop>
+  <tabstop>generateLinksButton</tabstop>
  </tabstops>
  <resources/>
  <connections>
   <connection>
-   <sender>SetExpiration</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>dateEdit</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>54</x>
-     <y>141</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>52</x>
-     <y>198</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>SetPassword</sender>
    <signal>clicked(bool)</signal>
-   <receiver>lineEdit</receiver>
+   <receiver>password</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -202,6 +185,22 @@
     <hint type="destinationlabel">
      <x>66</x>
      <y>68</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>SetExpiration</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>Expiration</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>85</x>
+     <y>151</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>89</x>
+     <y>185</y>
     </hint>
    </hints>
   </connection>
