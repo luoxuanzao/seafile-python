@@ -86,7 +86,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.select_all.setText(_translate("MainWindow", "全选"))
         self.search_button.setText(_translate("MainWindow", "..."))
-        self.pushButton.setText(_translate("MainWindow", "生成上传链接"))
+        self.pushButton.setText(_translate("MainWindow", "共享"))
         self.uploadFolderButton.setText(_translate("MainWindow", "批量生成文件夹"))
         self.checkSharedLink.setText(_translate("MainWindow", "查看上传链接"))
         self.actiona.setText(_translate("MainWindow", "a"))

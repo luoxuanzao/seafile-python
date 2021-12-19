@@ -6,6 +6,7 @@ from Ui_Login import Ui_Form
 from conf import config
 from Ui_MainWindows import Ui_MainWindow
 from Ui_Links import Ui_Dialog
+from Ui_ShareConf import Ui_Dialog as ShareConf
 import sys
 import requests
 from urllib.parse import urlencode
@@ -207,26 +208,32 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 folderName = line.replace("\n", "")
                 self.library.creatDirectory(basePath + folderName)
 
+    #  todo 这里放到新的share类
     def creatUploadLinks(self):
         if self.library.repo_id is None:
             QMessageBox.critical(self, "警告", "请先指定资料库", QMessageBox.Ok)
             return
-        result = []
-        basePath = self.url_path.text()
-        for i in range(self.listWidget.count()):
-            item = self.listWidget.item(i)
-            if item.checkState():
-                item.setCheckState(Qt.Unchecked)
-                if self.item_list[i]['type'] in ['dir', 'folder']:
-                    link = self.library.creatUploadLink(basePath + item.text())
-                    storeNode = {"link": link, "folderName": item.text()}
-                    result.append(storeNode)
-        if len(result) > 0:
-            with open("linksOfFolder.csv", "a+") as f:
-                for i in range(len(result)):
-                    f.write(result[i]['link'] + "," + result[i]["folderName"] + "\n")
+        # result = []
+        # basePath = self.url_path.text()
+        # for i in range(self.listWidget.count()):
+        #     item = self.listWidget.item(i)
+        #     if item.checkState():
+        #         item.setCheckState(Qt.Unchecked)
+        #         if self.item_list[i]['type'] in ['dir', 'folder']:
+        #             link = self.library.creatUploadLink(basePath + item.text())
+        #             storeNode = {"link": link, "folderName": item.text()}
+        #             result.append(storeNode)
+        # if len(result) > 0:
+        #     with open("linksOfFolder.csv", "a+") as f:
+        #         for i in range(len(result)):
+        #             f.write(result[i]['link'] + "," + result[i]["folderName"] + "\n")
+        #
+        # self.select_all.setChecked(False)
+        share_windows = ShareConfig(self)
+        share_windows.token = self.token
 
-        self.select_all.setChecked(False)
+        share_windows.init()
+        share_windows.show()
 
     def ShowLinkWindow(self):
         main_windows = CheckLinks(self)
@@ -270,6 +277,17 @@ class CheckLinks(QDialog, Ui_Dialog):
             item = self.listWidget.item(i)
             if item.checkState():
                 self.library.deleteSharedLinks(self.link_list[i]['token'])
+
+
+class ShareConfig(QDialog, ShareConf):
+    def __init__(self, parent=None):
+        super(QDialog, self).__init__(parent)
+        self.setupUi(self)
+
+    def init(self):
+        self.library = Libraries(self.token)
+
+
 
 
 if __name__ == '__main__':
