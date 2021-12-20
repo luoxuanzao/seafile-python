@@ -241,7 +241,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         share_windows = ShareConfig(self)
         share_windows.token = self.token
-        # share_windows.paths = paths
+        share_windows.paths = paths
         share_windows.init()
         share_windows.show()
 
@@ -303,6 +303,7 @@ class ShareConfig(QDialog, ShareConf):
         self.downloadAndUpload.clicked.connect(self.selectCheckBox)
         self.Expiration.setMinimumDateTime(QDateTime.currentDateTime())
         self.Expiration.setCalendarPopup(True)
+        self.Expiration.setDisplayFormat("yyyy-MM-dd HH:mm")
 
         self.can_edit = False,
         self.can_download = False
@@ -328,8 +329,8 @@ class ShareConfig(QDialog, ShareConf):
         if self.SetPassword.isChecked():
             print(self.password.text())
         if self.SetExpiration.isChecked():
-            print(self.Expiration.text())
-
+            print(self.Expiration.text().replace(" ", "T") + ":00+08:00")
+        print(self.paths)
         # result = []
         # for path in self.paths:
         #     result.append(self.library.creatUploadLink(path))
