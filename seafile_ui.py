@@ -15,6 +15,7 @@ import json
 import traceback
 import os
 from seafile import Libraries
+import random, string
 
 """
 这个文件为UI功能窗口，主要为调用seafile.py文件
@@ -63,6 +64,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
         self.token = ""
+        self.library = None
 
     def init(self):
         self.library = Libraries(self.token)
@@ -141,7 +143,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         if self.library.current.tag == 'root':
             return None
-        # print(self.library.history)
+
         self.library.current = self.library.history[-1]
         self.library.history.pop()
         self.library.path = self.library.path_history[-1]
@@ -164,7 +166,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         跳转
         """
-        if self.library.repo_id == None:
+        if self.library.repo_id is None:
             QMessageBox.critical(self, "警告", "请先进入资料库", QMessageBox.Ok)
             return
         path = self.url_path.text()
@@ -180,6 +182,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         except ValueError:
             QMessageBox.critical(self, "警告", "无此路径或路径错误", QMessageBox.Ok)
 
+    #  todo 改为搜索当前list文件
     def search(self):
         q = self.search_input.text()
         if self.library.repo_id is None:
@@ -241,6 +244,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         share_windows = ShareConfig(self)
         share_windows.token = self.token
+        share_windows.library = self.library
         share_windows.paths = paths
         share_windows.init()
         share_windows.show()
@@ -289,13 +293,23 @@ class CheckLinks(QDialog, Ui_Dialog):
                 self.library.deleteSharedLinks(self.link_list[i]['token'])
 
 
+def create8BitPassword():
+    src = string.ascii_letters + string.digits
+    result = random.sample(src, 5)  # 从字母和数字中随机取5位
+    result.extend(random.sample(string.digits, 1))  # 让密码中一定包含数字
+    result.extend(random.sample(string.ascii_lowercase, 1))  # 让密码中一定包含小写字母
+    result.extend(random.sample(string.ascii_uppercase, 1))  # 让密码中一定包含大写字母
+    random.shuffle(result)  # 打乱列表顺序
+    result = ''.join(result)  # 将列表转化为字符串
+    return result
+
+
 class ShareConfig(QDialog, ShareConf):
     def __init__(self, parent=None):
         super(QDialog, self).__init__(parent)
         self.setupUi(self)
 
     def init(self):
-        self.library = Libraries(self.token)
         self.generateLinksButton.clicked.connect(self.generateLinks)
         self.checkAndDownload.setChecked(True)
         self.checkAndDownload.clicked.connect(self.selectCheckBox)
@@ -305,7 +319,7 @@ class ShareConfig(QDialog, ShareConf):
         self.Expiration.setCalendarPopup(True)
         self.Expiration.setDisplayFormat("yyyy-MM-dd HH:mm")
 
-        self.can_edit = False,
+        self.can_edit = False
         self.can_download = False
         self.can_upload = False
 
@@ -326,19 +340,48 @@ class ShareConfig(QDialog, ShareConf):
             self.can_upload = False
 
     def generateLinks(self):
+        passwords = []
+        for i in range(len(self.paths)):
+            passwords.append(None)
+        expiration_time = None
         if self.SetPassword.isChecked():
-            print(self.password.text())
+            passwords = self.getPasswords()
+
         if self.SetExpiration.isChecked():
-            print(self.Expiration.text().replace(" ", "T") + ":00+08:00")
-        print(self.paths)
-        # result = []
-        # for path in self.paths:
-        #     result.append(self.library.creatUploadLink(path))
-        #
-        # if len(result) > 0:
-        #     with open("linksOfFolder.csv", "a+") as f:
-        #         for i in range(len(result)):
-        #             f.write(result[i]['link'] + "," + result[i]["folderName"] + "\n")
+            expiration_time = self.Expiration.text().replace(" ", "T") + ":00+08:00"
+
+        permissions = {
+            "can_edit": self.can_edit,
+            "can_download": self.can_download,
+            "can_upload": self.can_upload
+        }
+        result = []
+        for i in range(len(self.paths)):
+            result.append(
+                self.library.creatUploadLink(self.paths[i], permissions, password=passwords[i],
+                                             expiration_time=expiration_time))
+
+        if len(result) > 0:
+            with open("linksOfFolder.csv", "a+") as f:
+                f.write("共享连接,文件名,密码\n")
+                for i in range(len(result)):
+                    f.write(result[i]['link'] + "," + result[i]["obj_name"] + "," + passwords[i] + "\n")
+
+    def getPasswords(self):
+        result = []
+        if self.samePassword.isChecked():
+            password = self.password.text()
+            if len(password) == 0:
+                print("请输入密码")
+                return
+            for i in range(len(self.paths)):
+                result.append(password)
+        elif self.generatePassword.isChecked():
+            while len(result) != len(self.paths):
+                p = create8BitPassword()
+                if p not in result:
+                    result.append(p)
+        return result
 
 
 if __name__ == '__main__':

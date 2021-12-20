@@ -68,17 +68,18 @@ class Libraries:
         html = requests.get(base_url, params=params, headers=self.headers)
         return html.json()
 
-    def creatUploadLink(self, path):
+    def creatUploadLink(self, path, permissions, expiration_time=None, password=None):
         base_url = "https://box.nju.edu.cn/api/v2.1/share-links/"
         body = {
             "repo_id": self.repo_id,
             "path": path,
-            "permissions": {
-                "can_edit": False,
-                "can_download": True,
-                "can_upload": True
-            }
+            "permissions": permissions
         }
+        if expiration_time is not None:
+            body["expiration_time"] = expiration_time
+        if password is not None:
+            body["password"] = password
+
         header = self.headers
         header["Content-type"] = "application/json"
 
@@ -87,8 +88,7 @@ class Libraries:
         if result.get("error_msg"):
             print(result['error_msg'])
         else:
-            print(result.get("link"))
-            return result['link']
+            return result
 
     def creatDirectory(self, path):
         base_url = "https://box.nju.edu.cn/api2/repos/{}/dir/".format(self.repo_id)
