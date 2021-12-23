@@ -97,7 +97,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.select_all.isChecked():
             self.listWidget.selectAll()
             for i in range(self.listWidget.count()):
-                self.listWidget.item(i).setCheckState(Qt.Checked)
+                if not self.listWidget.item(i).isHidden():
+                    self.listWidget.item(i).setCheckState(Qt.Checked)
         else:
             self.listWidget.clearSelection()
             for i in range(self.listWidget.count()):
@@ -284,8 +285,7 @@ class CheckLinks(QDialog, Ui_Dialog):
         if self.select_all.isChecked():
             self.listWidget.selectAll()
             for i in range(self.listWidget.count()):
-                if not self.listWidget.item(i).isHidden():
-                    self.listWidget.item(i).setCheckState(Qt.Checked)
+                self.listWidget.item(i).setCheckState(Qt.Checked)
         else:
             self.listWidget.clearSelection()
             for i in range(self.listWidget.count()):
@@ -360,18 +360,23 @@ class ShareConfig(QDialog, ShareConf):
             "can_download": self.can_download,
             "can_upload": self.can_upload
         }
-        result = []
-        for i in range(len(self.paths)):
-            result.append(
-                self.library.creatUploadLink(self.paths[i], permissions, password=passwords[i],
-                                             expiration_time=expiration_time))
 
-        if len(result) > 0:
-            with open("linksOfFolder.csv", "a+") as f:
-                f.write("共享连接,文件名,密码\n")
-                for i in range(len(result)):
-                    f.write(result[i]['link'] + "," + result[i]["obj_name"] + "," + passwords[i] + "\n")
-                    print(result[i]['link'] + "," + result[i]["obj_name"] + "," + passwords[i] + "\n")
+        with open("linksOfFolder.csv", "a+", encoding="utf-8") as f:
+            f.write("文件名,共享连接，密码\n")
+            for i in range(len(self.paths)):
+                result = self.library.creatUploadLink(self.paths[i], permissions, password=passwords[i],
+                                                      expiration_time=expiration_time)
+                if result[0]:
+                    content = result[1]["obj_name"] + "," + result[1]['link'] + ","
+                    if passwords[i] is None:
+                        content += "无 \n"
+                    else:
+                        content += passwords[i] + "\n"
+                    f.write(content)
+                else:
+                    f.write(self.paths[i] + "," + result[1]['error_msg'] + "\n")
+        QMessageBox.critical(self, "结果", "请在linksOfFolder.csv中查看结果", QMessageBox.Ok)
+        self.destroy()
 
     def getPasswords(self):
         result = []

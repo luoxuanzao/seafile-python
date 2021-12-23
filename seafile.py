@@ -86,10 +86,10 @@ class Libraries:
 
         response = requests.post(base_url, json=body, headers=header)
         result = response.json()
+        success = True
         if result.get("error_msg"):
-            print(result['error_msg'])
-        else:
-            return result
+            success = False
+        return success, result
 
     def creatDirectory(self, path):
         base_url = "https://box.nju.edu.cn/api2/repos/{}/dir/".format(self.repo_id)
