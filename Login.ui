@@ -50,10 +50,10 @@
   <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>150</y>
+     <x>50</x>
+     <y>160</y>
      <width>411</width>
-     <height>81</height>
+     <height>41</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -62,29 +62,6 @@
     </property>
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QLabel" name="username_label">
-        <property name="font">
-         <font>
-          <family>华文仿宋</family>
-          <pointsize>15</pointsize>
-          <weight>75</weight>
-          <italic>false</italic>
-          <bold>true</bold>
-          <strikeout>false</strikeout>
-         </font>
-        </property>
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="text">
-         <string>用户名：</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
       <item>
        <widget class="QLabel" name="label">
         <property name="font">
@@ -99,7 +76,7 @@
          <enum>Qt::LeftToRight</enum>
         </property>
         <property name="text">
-         <string>密码：</string>
+         <string>Token:</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -110,22 +87,6 @@
     </item>
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QLineEdit" name="username_input">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="font">
-         <font>
-          <family>华文仿宋</family>
-          <pointsize>15</pointsize>
-         </font>
-        </property>
-       </widget>
-      </item>
       <item>
        <widget class="QLineEdit" name="password_input">
         <property name="enabled">
@@ -144,7 +105,7 @@
          </font>
         </property>
         <property name="echoMode">
-         <enum>QLineEdit::Password</enum>
+         <enum>QLineEdit::Normal</enum>
         </property>
        </widget>
       </item>

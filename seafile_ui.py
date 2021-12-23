@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import QWidget, QApplication, QMessageBox, QMainWindow, \
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import QSize, Qt, QDateTime
 from Ui_Login import Ui_Form
-from conf import config
 from Ui_MainWindows import Ui_MainWindow
 from Ui_Links import Ui_Dialog
 from Ui_ShareConf import Ui_Dialog as ShareConf
@@ -17,7 +16,7 @@ import os
 from seafile import Libraries
 import random, string
 import _thread
-
+from readConf import read_config
 """
 这个文件为UI功能窗口，主要为调用seafile.py文件
 """
@@ -30,34 +29,29 @@ class Login(QWidget, Ui_Form):
         self.login_button.clicked.connect(self.login_func)
         self.password_input.returnPressed.connect(self.login_func)
         self.url = "box.nju.edu.cn"
-        self.username_input.setText(config.username)
-        self.password_input.setText(config.password)
+        self.password_input.setText(read_config())
 
     def login_func(self):
-        if self.username_input.text() and self.password_input.text():
-            base_url = "https://{}/api2/auth-token/".format(self.url)
-            params = {
-                'username': self.username_input.text(),
-                'password': self.password_input.text()
+        if self.password_input.text():
+            base_url = "https://{}/api2/account/info".format(self.url)
+            headers = {
+                'Authorization': "Token " + self.password_input.text()
             }
-            html = requests.post(base_url, data=params)
+            html = requests.post(base_url, headers=headers)
             if html.status_code == 200:
-                res = html.json()
-                self.token = res['token']
-                temp = self.winshow(self.token)
-                print(self.token)
+                self.token = self.password_input.text()
+                self.showMainWin(self.token)
                 self.hide()
             else:
-                QMessageBox.critical(self, "警告", "用户名或密码错误", QMessageBox.Ok)
+                QMessageBox.critical(self, "警告", "Token不正确", QMessageBox.Ok)
         else:
-            QMessageBox.critical(self, "警告", "用户名和密码不能为空", QMessageBox.Ok)
+            QMessageBox.critical(self, "警告", "Token不能为空", QMessageBox.Ok)
 
-    def winshow(self, token):
+    def showMainWin(self, token):
         main_windows = MainWindow(self)
         main_windows.token = token
         main_windows.init()
         main_windows.show()
-        return main_windows
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -365,21 +359,21 @@ class ShareConfig(QDialog, ShareConf):
             "can_upload": self.can_upload
         }
 
-        with open("linksOfFolder.csv", "a+", encoding="utf-8") as f:
-            f.write("文件名,共享连接，密码\n")
+        with open("linksOfFolder.csv", "a+") as f:
+            f.write("file,link,password\n")
             for i in range(len(self.paths)):
                 result = self.library.creatUploadLink(self.paths[i], permissions, password=passwords[i],
                                                       expiration_time=expiration_time)
                 if result[0]:
                     content = result[1]["obj_name"] + "," + result[1]['link'] + ","
                     if passwords[i] is None:
-                        content += "无 \n"
+                        content += "no password \n"
                     else:
                         content += passwords[i] + "\n"
                     f.write(content)
                 else:
                     f.write(self.paths[i] + "," + result[1]['error_msg'] + "\n")
-        QMessageBox.information(self, "注意", "请在linksOfFolder.csv中查看结果", QMessageBox.Ok)
+        QMessageBox.information(self, "注意", "请在exe同目录下的linksOfFolder.csv中查看结果", QMessageBox.Ok)
         self.destroy()
 
     def getPasswords(self):

@@ -126,6 +126,10 @@
     <property name="text">
      <string>...</string>
     </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>resource/搜搜.png</normaloff>resource/搜搜.png</iconset>
+    </property>
    </widget>
    <widget class="QFrame" name="frame">
     <property name="geometry">

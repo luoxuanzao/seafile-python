@@ -64,7 +64,7 @@ class Ui_Dialog(object):
         self.password.setObjectName("password")
         self.label = QtWidgets.QLabel(self.frame)
         self.label.setEnabled(False)
-        self.label.setGeometry(QtCore.QRect(10, 50, 48, 16))
+        self.label.setGeometry(QtCore.QRect(10, 50, 81, 16))
         self.label.setObjectName("label")
         self.generatePassword = QtWidgets.QRadioButton(self.frame)
         self.generatePassword.setGeometry(QtCore.QRect(330, 20, 181, 16))
