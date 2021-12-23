@@ -90,6 +90,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.pushButton.clicked.connect(self.creatUploadLinks)
         self.uploadFolderButton.clicked.connect(self.creatFolder)
         self.search_input.returnPressed.connect(self.search)
+        self.search_input.textChanged.connect(self.search)
         self.checkSharedLink.clicked.connect(self.ShowLinkWindow)
 
     def check(self):
@@ -183,20 +184,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             QMessageBox.critical(self, "警告", "无此路径或路径错误", QMessageBox.Ok)
 
     #  todo 改为搜索当前list文件
-    def search(self):
-        q = self.search_input.text()
+    def search(self, text=None):
         if self.library.repo_id is None:
             QMessageBox.critical(self, "警告", "请先指定资料库", QMessageBox.Ok)
             return
-        items = self.library.search(q)
-        item_list = []
-        self.library.history.append(self.library.current)
-        self.library.path_history.append(self.library.path)
-        self.library.current = self.library.tree.create_node(tag=q, parent=self.library.current)
-        for item in items['data']:
-            item['name'] = item['path'].split('/')[-1]
-            item_list.append(item)
-        self.update_list(item_list)
+
+        q = self.search_input.text()
+        if text is None or len(q) == 0:
+            for i in range(self.listWidget.count()):
+                item = self.listWidget.item(i)
+                item.setHidden(False)
+        else:
+            for i in range(self.listWidget.count()):
+                item = self.listWidget.item(i)
+                if q in item.text():
+                    item.setHidden(False)
+                else:
+                    item.setHidden(True)
 
     def creatFolder(self):
         if self.library.repo_id is None:
@@ -366,6 +370,7 @@ class ShareConfig(QDialog, ShareConf):
                 f.write("共享连接,文件名,密码\n")
                 for i in range(len(result)):
                     f.write(result[i]['link'] + "," + result[i]["obj_name"] + "," + passwords[i] + "\n")
+                    print(result[i]['link'] + "," + result[i]["obj_name"] + "," + passwords[i] + "\n")
 
     def getPasswords(self):
         result = []

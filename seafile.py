@@ -59,14 +59,15 @@ class Libraries:
         self.current = self.tree.children(self.current.identifier)[id_index]
         return self.get_data(self.path)
 
-    def search(self, q):
-        base_url = "http://box.nju.edu.cn/api/v2.1/search-file/"
-        params = {
-            "repo_id": self.repo_id,
-            "q": q
-        }
-        html = requests.get(base_url, params=params, headers=self.headers)
-        return html.json()
+    # 搜索当前路径下所有的文件
+    # def search(self, q):
+    #     base_url = "http://box.nju.edu.cn/api/v2.1/search-file/"
+    #     params = {
+    #         "repo_id": self.repo_id,
+    #         "q": q
+    #     }
+    #     html = requests.get(base_url, params=params, headers=self.headers)
+    #     return html.json()
 
     def creatUploadLink(self, path, permissions, expiration_time=None, password=None):
         base_url = "https://box.nju.edu.cn/api/v2.1/share-links/"
