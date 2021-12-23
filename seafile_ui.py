@@ -284,7 +284,8 @@ class CheckLinks(QDialog, Ui_Dialog):
         if self.select_all.isChecked():
             self.listWidget.selectAll()
             for i in range(self.listWidget.count()):
-                self.listWidget.item(i).setCheckState(Qt.Checked)
+                if not self.listWidget.item(i).isHidden():
+                    self.listWidget.item(i).setCheckState(Qt.Checked)
         else:
             self.listWidget.clearSelection()
             for i in range(self.listWidget.count()):
