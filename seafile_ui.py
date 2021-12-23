@@ -16,6 +16,7 @@ import traceback
 import os
 from seafile import Libraries
 import random, string
+import _thread
 
 """
 这个文件为UI功能窗口，主要为调用seafile.py文件
@@ -184,7 +185,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         except ValueError:
             QMessageBox.critical(self, "警告", "无此路径或路径错误", QMessageBox.Ok)
 
-    #  todo 改为搜索当前list文件
     def search(self, text=None):
         if self.library.repo_id is None:
             QMessageBox.critical(self, "警告", "请先指定资料库", QMessageBox.Ok)
@@ -207,31 +207,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.library.repo_id is None:
             QMessageBox.critical(self, "警告", "请先指定资料库", QMessageBox.Ok)
             return
-        csvName, fileType = QFileDialog.getOpenFileName(self, "打开图片", "", "*.csv;;*.txt")
+        QMessageBox.information(self, "注意", "csv/txt 每行存一个文件夹名称", QMessageBox.Ok)
+
+        fileName, fileType = QFileDialog.getOpenFileName(self, "打开图片", "", "*.csv;;*.txt")
+
+        if len(fileName) == 0:
+            return
 
         basePath = self.url_path.text()
 
-        with open(csvName, 'r', encoding="utf-8") as f:
+        QMessageBox.information(self, "通知", "正在上传请稍后", QMessageBox.Ok)
+        with open(fileName, 'r', encoding="utf-8") as f:
             for line in f:
                 folderName = line.replace("\n", "")
                 self.library.creatDirectory(basePath + folderName)
+        QMessageBox.information(self, "通知", "上传完成，请刷新", QMessageBox.Ok)
 
-    #  todo 这里放到新的share类
     def creatUploadLinks(self):
         if self.library.repo_id is None:
             QMessageBox.critical(self, "警告", "请先指定资料库", QMessageBox.Ok)
             return
-
-        # result = []
-        # basePath = self.url_path.text()
-        # for i in range(self.listWidget.count()):
-        #     item = self.listWidget.item(i)
-        #     if item.checkState():
-        #         item.setCheckState(Qt.Unchecked)
-        #         if self.item_list[i]['type'] in ['dir', 'folder']:
-        #             link = self.library.creatUploadLink(basePath + item.text())
-        #             storeNode = {"link": link, "folderName": item.text()}
-        #             result.append(storeNode)
 
         self.select_all.setChecked(False)
         paths = []
@@ -244,7 +239,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     paths.append(basePath + item.text())
 
         if len(paths) == 0:
-            print("请选择文件夹")
+            QMessageBox.critical(self, "警告", "请选择文件夹", QMessageBox.Ok)
             return
 
         share_windows = ShareConfig(self)
@@ -270,7 +265,6 @@ class CheckLinks(QDialog, Ui_Dialog):
         self.library = Libraries(self.token)
         self.link_list = self.library.getSharedLinks()
         for link in self.link_list:
-            print(link)
             item = QListWidgetItem()
             icon = QIcon()
             icon.addPixmap(QPixmap("./resource/link.png"), QIcon.Selected, QIcon.On)
@@ -292,10 +286,20 @@ class CheckLinks(QDialog, Ui_Dialog):
                 self.listWidget.item(i).setCheckState(Qt.Unchecked)
 
     def deleteUploadLinks(self):
+        selectedCount = 0
+        for i in range(self.listWidget.count()):
+            item = self.listWidget.item(i)
+            if item.checkState():
+                selectedCount += 1
+        if selectedCount == 0:
+            QMessageBox.critical(self, "警告", "请选择要删除的链接", QMessageBox.Ok)
+            return
         for i in range(self.listWidget.count()):
             item = self.listWidget.item(i)
             if item.checkState():
                 self.library.deleteSharedLinks(self.link_list[i]['token'])
+        QMessageBox.information(self, "完成", "删除成功", QMessageBox.Ok)
+        self.destroy()
 
 
 def create8BitPassword():
@@ -375,7 +379,7 @@ class ShareConfig(QDialog, ShareConf):
                     f.write(content)
                 else:
                     f.write(self.paths[i] + "," + result[1]['error_msg'] + "\n")
-        QMessageBox.critical(self, "结果", "请在linksOfFolder.csv中查看结果", QMessageBox.Ok)
+        QMessageBox.information(self, "注意", "请在linksOfFolder.csv中查看结果", QMessageBox.Ok)
         self.destroy()
 
     def getPasswords(self):

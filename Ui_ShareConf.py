@@ -56,7 +56,7 @@ class Ui_Dialog(object):
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setObjectName("frame")
         self.samePassword = QtWidgets.QRadioButton(self.frame)
-        self.samePassword.setGeometry(QtCore.QRect(10, 20, 147, 16))
+        self.samePassword.setGeometry(QtCore.QRect(10, 20, 231, 16))
         self.samePassword.setObjectName("samePassword")
         self.password = QtWidgets.QLineEdit(self.frame)
         self.password.setEnabled(False)
@@ -67,7 +67,7 @@ class Ui_Dialog(object):
         self.label.setGeometry(QtCore.QRect(10, 50, 48, 16))
         self.label.setObjectName("label")
         self.generatePassword = QtWidgets.QRadioButton(self.frame)
-        self.generatePassword.setGeometry(QtCore.QRect(330, 20, 135, 16))
+        self.generatePassword.setGeometry(QtCore.QRect(330, 20, 181, 16))
         self.generatePassword.setObjectName("generatePassword")
 
         self.retranslateUi(Dialog)
