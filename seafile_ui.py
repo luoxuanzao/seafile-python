@@ -323,7 +323,7 @@ class ShareConfig(QDialog, ShareConf):
         self.Expiration.setDisplayFormat("yyyy-MM-dd HH:mm")
 
         self.can_edit = False
-        self.can_download = False
+        self.can_download = True
         self.can_upload = False
 
     def selectCheckBox(self):
